@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.nyon.ithu.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MinecraftServerMixin",
+    "PlayerListMixin",
+    "ServerLevelMixin",
+    "ServerPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MinecraftMixin"
+  ]
+}

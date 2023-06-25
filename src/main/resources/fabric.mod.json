@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "name": "${name}",
+  "description": "${description}",
+  "icon": "assets/item-hunt/icon.png",
+  "contact": {
+    "issues": "https://github.com/btwonion/item-hunt/issues",
+    "sources": "https://github.com/btwonion/item-hunt"
+  },
+  "authors": [
+    {
+      "name": "btwonion"
+    }
+  ],
+  "contributors": [],
+  "license": ["GNU General Public License v3.0"],
+  "version": "${version}",
+  "environment": "*",
+  "depends": {
+    "fabric-language-kotlin": ">=1.9.5+kotlin.1.8.22",
+    "yet_another_config_lib_v3": ">=3.0.1+1.20",
+    "fabric-api": ">=0.83.0+1.20",
+    "minecraft": ">=1.20"
+  },
+  "suggests": {
+    "modmenu": ">=7.0.0"
+  },
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "dev.nyon.ithu.ItemHunt"
+      }
+    ],
+    "modmenu": [
+      {
+        "adapter": "kotlin",
+        "value": "dev.nyon.ithu.config.ModMenuImpl"
+      }
+    ]
+  },
+  "mixins": [
+    "item-hunt.mixins.json"
+  ],
+  "custom": {
+    "modmenu" : {
+      "links": {
+        "modmenu.discord": "https://discord.gg/pmHTtZnMd3"
+      }
+    }
+  }
+}
