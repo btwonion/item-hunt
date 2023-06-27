@@ -1,15 +1,17 @@
 package dev.nyon.ithu.mixins;
 
-import dev.nyon.ithu.config.ItemHuntDataKt;
+import dev.nyon.ithu.challenge.ItemHuntDataKt;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.RandomSequences;
+import net.minecraft.world.level.CustomSpawner;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
-import org.spongepowered.asm.mixin.Final;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,11 +22,10 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 @Mixin(ServerLevel.class)
-public class ServerLevelMixin {
+public abstract class ServerLevelMixin {
 
     @Shadow
-    @Final
-    private ServerLevelData serverLevelData;
+    public abstract @NotNull MinecraftServer getServer();
 
     @Inject(
         method = "<init>",
@@ -35,17 +36,17 @@ public class ServerLevelMixin {
         Executor executor,
         LevelStorageSource.LevelStorageAccess levelStorageAccess,
         ServerLevelData levelData,
-        ResourceKey resourceKey,
+        ResourceKey<Level> resourceKey,
         LevelStem levelStem,
         ChunkProgressListener chunkProgressListener,
         boolean bl,
         long l,
-        List list,
+        List<CustomSpawner> list,
         boolean bl2,
         RandomSequences randomSequences,
         CallbackInfo ci
     ) {
-        ItemHuntDataKt.loadLevelData(levelData.getLevelName());
+        ItemHuntDataKt.loadLevelData(levelStorageAccess.getLevelId());
     }
 
     @Inject(
@@ -53,6 +54,6 @@ public class ServerLevelMixin {
         at = @At("TAIL")
     )
     public void saveData(CallbackInfo ci) {
-        ItemHuntDataKt.saveLevelData(serverLevelData.getLevelName());
+        ItemHuntDataKt.saveLevelData(((MinecraftServerAccessor) getServer()).getStorageSource().getLevelId());
     }
 }

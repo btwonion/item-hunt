@@ -27,7 +27,13 @@
     "modmenu": ">=7.0.0"
   },
   "entrypoints": {
-    "main": [
+    "server": [
+      {
+        "adapter": "kotlin",
+        "value": "dev.nyon.ithu.ItemHunt"
+      }
+    ],
+    "client": [
       {
         "adapter": "kotlin",
         "value": "dev.nyon.ithu.ItemHunt"

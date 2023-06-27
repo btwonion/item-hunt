@@ -1,15 +1,26 @@
-package dev.nyon.ithu.config
+package dev.nyon.ithu.challenge
 
+import dev.nyon.ithu.challenge.client.ItemHuntUpdatePacket
+import dev.nyon.ithu.config.ExcludeConfig
+import dev.nyon.ithu.config.configPath
+import dev.nyon.ithu.config.json
 import dev.nyon.ithu.utils.ItemSerializer
 import dev.nyon.ithu.utils.UUIDSerializer
 import dev.nyon.ithu.utils.removeCreativeItems
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.item.Item
 import java.util.*
-import kotlin.io.path.*
+import kotlin.io.path.createFile
+import kotlin.io.path.notExists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 
 var currentItemHuntData: ItemHuntDataHolder? = null
@@ -21,7 +32,6 @@ data class ItemHuntDataHolder(
     var playerData: MutableMap<@Serializable(with = UUIDSerializer::class) UUID, ItemHuntData> = mutableMapOf()
 ) {
     fun initPlayerData(uuid: UUID): ItemHuntData {
-        println("player")
         var data = playerData[uuid]
         if (data == null) {
             val newData = ItemHuntData()
@@ -33,10 +43,26 @@ data class ItemHuntDataHolder(
         return data
     }
 
-    fun awardItemToPlayer(uuid: UUID, item: Item) {
-        val data = playerData[uuid] ?: return
+    fun awardItemToPlayer(player: ServerPlayer, item: Item) {
+        val data = playerData[player.uuid] ?: return
         data.foundItems += item
         data.nextItems -= item
+
+        player.playSound(SoundEvents.NOTE_BLOCK_PLING.value())
+        player.sendSystemMessage(
+            Component.literal("You completed the item: ").withStyle(Style.EMPTY.withColor(0xBAA46D))
+                .append(
+                    Component.literal(item.description.string).withStyle(Style.EMPTY.withColor(0xBA7C6B).withBold(true))
+                )
+                .append(
+                    Component.literal("!").withStyle(Style.EMPTY.withColor(0xBAA46D))
+                )
+        )
+
+        ServerPlayNetworking.send(
+            player,
+            ItemHuntUpdatePacket(data.nextItems.firstOrNull(), data.foundItems.size + 1, data.nextItems.size + 1)
+        )
     }
 }
 
@@ -48,7 +74,6 @@ data class ItemHuntData(
 )
 
 fun loadLevelData(name: String) {
-    println("world")
     val file = configPath.resolve("$name.data.json").also { if (it.notExists()) it.createFile() }
     val fileText = file.readText()
     if (fileText.isBlank()) {

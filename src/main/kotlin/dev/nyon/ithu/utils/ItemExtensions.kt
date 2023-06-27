@@ -10,6 +10,8 @@ fun MutableList<Item>.removeCreativeItems(): MutableList<Item> {
     remove(Items.COMMAND_BLOCK_MINECART)
     remove(Items.CHAIN_COMMAND_BLOCK)
     remove(Items.REPEATING_COMMAND_BLOCK)
+    remove(Items.SPAWNER)
+    remove(Items.AIR)
     removeIf { val key = BuiltInRegistries.ITEM.getKey(it); key.toString().endsWith("spawn_egg") }
     return this
 }
