@@ -3,7 +3,7 @@
   "id": "${id}",
   "name": "${name}",
   "description": "${description}",
-  "icon": "assets/item-hunt/icon.png",
+  "icon": "assets/ithu/icon.png",
   "contact": {
     "issues": "https://github.com/btwonion/item-hunt/issues",
     "sources": "https://github.com/btwonion/item-hunt"
