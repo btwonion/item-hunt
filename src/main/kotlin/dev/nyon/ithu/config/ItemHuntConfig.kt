@@ -6,6 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.world.item.Item
+import java.nio.file.Path
 import kotlin.io.path.*
 
 @Serializable
@@ -24,9 +25,9 @@ val json: Json = Json {
     ignoreUnknownKeys = true
     encodeDefaults = true
 }
-val configPath = FabricLoader.getInstance().configDir.resolve("item-hunt/").also { it.createDirectories() }
+val configPath: Path = FabricLoader.getInstance().configDir.resolve("item-hunt/").also { it.createDirectories() }
 var generalConfig = ItemHuntConfig()
-val generalConfigFile = configPath.resolve("config.json").also { if (it.notExists()) it.createFile() }
+val generalConfigFile: Path = configPath.resolve("config.json").also { if (it.notExists()) it.createFile() }
 
 fun saveConfig() {
     generalConfigFile.writeText(json.encodeToString(generalConfig))
