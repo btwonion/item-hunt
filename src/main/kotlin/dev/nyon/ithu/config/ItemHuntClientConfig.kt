@@ -8,7 +8,13 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 data class ItemHuntClientConfig(
-    val overlayDisplayed: Boolean = true
+    var overlayDisplayed: Boolean = true,
+    var hideProgress: Boolean = false,
+    var hideItemIcon: Boolean = false,
+    var hideItemName: Boolean = false,
+    var center: Boolean = true,
+    var customX: Int = 10,
+    var y: Int = 5
 )
 
 val clientConfigFile: Path = configPath.resolve("client-config.json").also { if (it.notExists()) it.createFile() }
