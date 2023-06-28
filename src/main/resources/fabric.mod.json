@@ -42,7 +42,7 @@
     "modmenu": [
       {
         "adapter": "kotlin",
-        "value": "dev.nyon.ithu.config.ModMenuImpl"
+        "value": "dev.nyon.ithu.config.client.ModMenuImpl"
       }
     ]
   },
