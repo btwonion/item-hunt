@@ -3,6 +3,9 @@
 > Fabric/Quilt mod, which adds a game-like challenge to gather all items
 >> Goal: Collect all items in the game! :)
 
+## Minecraft compatibility
+This project is not actively maintained by me anymore. Nevertheless, i will fix bugs and update to a specific version on request. For this simply join my discord linked below.
+
 ## Configuration
 
 The items contained in this challenge are configurable via the config file:
