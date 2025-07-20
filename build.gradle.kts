@@ -19,7 +19,6 @@ val majorVersion = "1.0.0"
 val mcVersion = "1.21.8"
 version = "$majorVersion-$mcVersion"
 description = "Fabric/Quilt mod, which adds a game like feature to gather all items"
-val authors = listOf("btwonion")
 val githubRepo = "btwonion/item-hunt"
 
 repositories {
@@ -91,7 +90,7 @@ val changelogText =
 
 modrinth {
     token.set(findProperty("modrinth.token")?.toString())
-    projectId.set("eWxWZCSi")
+    projectId.set("mExC8RRZ")
     versionNumber.set(project.version.toString())
     versionType.set("release")
     uploadFile.set(tasks["remapJar"])
