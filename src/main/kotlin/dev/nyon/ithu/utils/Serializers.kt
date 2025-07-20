@@ -15,7 +15,7 @@ object ItemSerializer : KSerializer<Item> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("item", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): Item {
-        return BuiltInRegistries.ITEM.get(ResourceLocation(decoder.decodeString()))
+        return BuiltInRegistries.ITEM.get(ResourceLocation.parse(decoder.decodeString())).get().value()
     }
 
     override fun serialize(encoder: Encoder, value: Item) {

@@ -1,41 +1,41 @@
 package dev.nyon.ithu.challenge.client
 
-import net.fabricmc.fabric.api.networking.v1.FabricPacket
-import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 
-val packetIdentifier = ResourceLocation("ithu", "item_hunt_update")
+val packetIdentifier: ResourceLocation = ResourceLocation.fromNamespaceAndPath("ithu", "item_hunt_update")
 
-data class ItemHuntUpdatePacket(val nextItem: Item?, val completed: Int, val left: Int) : FabricPacket {
+data class ItemHuntUpdatePacket(val nextItem: Item?, val completed: Int, val left: Int) : CustomPacketPayload {
     companion object {
-        val packetType: PacketType<ItemHuntUpdatePacket> = PacketType.create(packetIdentifier) {
-            val compound = it.readNbt()!!
-            val nextItemString = compound.getString("next_item")
-            val nextItem =
-                if (nextItemString == "null") null else BuiltInRegistries.ITEM.get(ResourceLocation(nextItemString))
-            val completed = compound.getInt("completed")
-            val left = compound.getInt("left")
+        val packetType: CustomPacketPayload.Type<ItemHuntUpdatePacket> = CustomPacketPayload.Type(packetIdentifier)
 
-            return@create ItemHuntUpdatePacket(nextItem, completed, left)
+        @Suppress("unused")
+        val codec = object : StreamCodec<FriendlyByteBuf, ItemHuntUpdatePacket> {
+            override fun decode(buf: FriendlyByteBuf): ItemHuntUpdatePacket {
+                val nextItemString = buf.readUtf()
+                val nextItem = if (nextItemString.isEmpty()) null else BuiltInRegistries.ITEM.get(
+                    ResourceLocation.parse(nextItemString)
+                ).get().value()
+                val completed = buf.readInt()
+                val left = buf.readInt()
+                return ItemHuntUpdatePacket(nextItem, completed, left)
+            }
+
+            override fun encode(buf: FriendlyByteBuf, packet: ItemHuntUpdatePacket) {
+                buf.writeUtf(
+                    if (packet.nextItem == null) "" else BuiltInRegistries.ITEM.getKey(packet.nextItem).toString()
+                )
+                buf.writeInt(packet.completed)
+                buf.writeInt(packet.left)
+            }
         }
     }
 
-    override fun write(buf: FriendlyByteBuf?) {
-        val compound = CompoundTag()
-        compound.putString(
-            "next_item",
-            if (nextItem == null) "null" else BuiltInRegistries.ITEM.getKey(nextItem).toString()
-        )
-        compound.putInt("completed", completed)
-        compound.putInt("left", left)
-        buf?.writeNbt(compound)
-    }
-
-    override fun getType(): PacketType<*> {
+    override fun type(): CustomPacketPayload.Type<out CustomPacketPayload?>? {
         return packetType
     }
 }

@@ -1,6 +1,5 @@
 package dev.nyon.ithu.config
 
-import kotlinx.serialization.encodeToString
 import java.nio.file.Path
 import kotlin.io.path.createFile
 import kotlin.io.path.notExists
@@ -29,7 +28,7 @@ fun loadClientConfig() {
 
     clientConfig = try {
         json.decodeFromString<ItemHuntClientConfig>(text)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         saveClientConfig()
         clientConfig
     }

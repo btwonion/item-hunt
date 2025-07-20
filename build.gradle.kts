@@ -1,21 +1,22 @@
 @file:Suppress("SpellCheckingInspection")
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.22"
-    kotlin("plugin.serialization") version "1.8.22"
-    id("fabric-loom") version "1.2-SNAPSHOT"
-    id("io.github.juuxel.loom-quiltflower") version "1.9.0"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
+    id("fabric-loom") version "1.11-SNAPSHOT"
 
-    id("com.modrinth.minotaur") version "2.8.0"
-    id("com.github.breadmoirai.github-release") version "2.4.1"
+    id("com.modrinth.minotaur") version "2.8.7"
+    id("com.github.breadmoirai.github-release") version "2.5.2"
     `maven-publish`
     signing
 }
 
 group = "dev.nyon"
 val majorVersion = "1.0.0"
-val mcVersion = "1.20"
+val mcVersion = "1.21.8"
 version = "$majorVersion-$mcVersion"
 description = "Fabric/Quilt mod, which adds a game like feature to gather all items"
 val authors = listOf("btwonion")
@@ -24,22 +25,24 @@ val githubRepo = "btwonion/item-hunt"
 repositories {
     mavenCentral()
     maven("https://maven.terraformersmc.com")
-    maven("https://maven.parchmentmc.org")
+    maven("https://maven.quiltmc.org/repository/release/")
     maven("https://maven.isxander.dev/releases")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:$mcVersion")
     mappings(loom.layered {
-        parchment("org.parchmentmc.data:parchment-1.19.3:2023.03.12@zip")
+        mappings("org.quiltmc:quilt-mappings:1.21.6-pre1+build.1:intermediary-v2")
         officialMojangMappings()
     })
-    modImplementation("net.fabricmc:fabric-loader:0.14.21")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.83.0+$mcVersion")
-    modImplementation("net.fabricmc:fabric-language-kotlin:1.9.5+kotlin.1.8.22")
-    modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:3.0.1+$mcVersion")
+
+    implementation("org.vineflower:vineflower:1.11.1")
+    modImplementation("net.fabricmc:fabric-loader:0.16.14")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.129.0+$mcVersion")
+    modImplementation("net.fabricmc:fabric-language-kotlin:1.13.4+kotlin.2.2.0")
+    modImplementation("dev.isxander:yet-another-config-lib:3.7.0+1.21.6-fabric")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    modApi("com.terraformersmc:modmenu:7.0.0")
+    modApi("com.terraformersmc:modmenu:15.0.0-beta.3")
 }
 
 tasks {
@@ -72,9 +75,19 @@ tasks {
         dependsOn("githubRelease")
         dependsOn("publish")
     }
+
+    withType<JavaCompile> {
+        options.release = 21
+    }
+
+    withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget = JvmTarget.fromTarget("21")
+        }
+    }
 }
 val changelogText =
-    file("changelogs/$version.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
+    file("changelogs.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
 
 modrinth {
     token.set(findProperty("modrinth.token")?.toString())
@@ -82,7 +95,7 @@ modrinth {
     versionNumber.set(project.version.toString())
     versionType.set("release")
     uploadFile.set(tasks["remapJar"])
-    gameVersions.set(listOf(mcVersion))
+    gameVersions.set(listOf("1.21.6", "1.21.7", "1.21.8"))
     loaders.set(listOf("fabric", "quilt"))
     dependencies {
         required.project("fabric-api")
@@ -98,17 +111,13 @@ githubRelease {
     token(findProperty("github.token")?.toString())
 
     val split = githubRepo.split("/")
-    owner(split[0])
-    repo(split[1])
-    tagName("v${project.version}")
-    body(changelogText)
-    overwrite(true)
-    releaseAssets(tasks["remapJar"].outputs.files)
-    targetCommitish("master")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    owner = split[0]
+    repo = split[1]
+    tagName = "v${project.version}"
+    body = changelogText
+    overwrite = true
+    releaseAssets = tasks["remapJar"].outputs.files
+    targetCommitish = "master"
 }
 
 publishing {
@@ -134,4 +143,9 @@ publishing {
 
 java {
     withSourcesJar()
+
+    JavaVersion.VERSION_21.let {
+        sourceCompatibility = it
+        targetCompatibility = it
+    }
 }

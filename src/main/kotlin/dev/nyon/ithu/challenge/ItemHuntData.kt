@@ -8,7 +8,6 @@ import dev.nyon.ithu.utils.ItemSerializer
 import dev.nyon.ithu.utils.UUIDSerializer
 import dev.nyon.ithu.utils.removeCreativeItems
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
@@ -52,7 +51,16 @@ data class ItemHuntDataHolder(
         player.sendSystemMessage(
             Component.literal("You completed the item: ").withStyle(Style.EMPTY.withColor(0xBAA46D))
                 .append(
-                    Component.literal(item.description.string).withStyle(Style.EMPTY.withColor(0xBA7C6B).withBold(true))
+                    item.name.copy().withStyle(Style.EMPTY.withColor(0xBA7C6B).withBold(true))
+                )
+                .append(
+                    Component.literal("!").withStyle(Style.EMPTY.withColor(0xBAA46D))
+                )
+        )
+        player.sendSystemMessage(
+            Component.literal("Next up is: ").withStyle(Style.EMPTY.withColor(0xBAA46D))
+                .append(
+                    data.nextItems.first().name.copy().withStyle(Style.EMPTY.withColor(0xBA7C6B).withBold(true))
                 )
                 .append(
                     Component.literal("!").withStyle(Style.EMPTY.withColor(0xBAA46D))
@@ -83,7 +91,7 @@ fun loadLevelData(name: String) {
 
     currentItemHuntData = try {
         json.decodeFromString<ItemHuntDataHolder>(fileText)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         ItemHuntDataHolder()
     }
 }

@@ -7,14 +7,12 @@
     "InventoryChangeTriggerMixin",
     "MinecraftServerAccessor",
     "MinecraftServerMixin",
-    "PlayerListMixin",
     "ServerLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "GuiMixin",
     "MinecraftMixin"
   ]
 }
